@@ -105,6 +105,10 @@ const studentSchema = mongoose.Schema({
     landMark: {
         type: String,
         required: [true, "Please add the landmark"]
+    },
+    schoolName: {
+        type: String,
+        required: [true, "Please add a schoolname"]
     }
 },
 )

@@ -7,10 +7,10 @@ const Fees = require("../models/feesModel")
 const createStudent = asyncHandler(async (req, res) => {
 
     // Destructuring data from the request
-    const { registerationNumber, registerationDate, studentClass, phoneNumber, section, studentName, fatherName, motherName, gender, dob, age, alternatePhoneNumber, email, address, town, city, district, state, pincode, village, landMark } = await req.body
+    const { registerationNumber, registerationDate, studentClass, phoneNumber, section, studentName, fatherName, motherName, gender, dob, age, alternatePhoneNumber, email, address, town, city, district, state, pincode, village, landMark, schoolName } = await req.body
 
     // Validation in the backend
-    if (!registerationNumber || !registerationDate || !studentClass || !phoneNumber || !section || !studentName || !fatherName || !motherName || !gender || !dob || !age || !alternatePhoneNumber || !email || !address || !town || !district || !state || !pincode || !landMark) {
+    if (!registerationNumber || !registerationDate || !studentClass || !phoneNumber || !section || !studentName || !fatherName || !motherName || !gender || !dob || !age || !alternatePhoneNumber || !email || !address || !town || !district || !state || !pincode || !landMark || !schoolName) {
         res.status(400)
         throw new Error("Please fill all the fields")
     }
@@ -51,12 +51,13 @@ const createStudent = asyncHandler(async (req, res) => {
             state,
             pincode,
             landMark,
-            monthlyFees
+            monthlyFees,
+            schoolName
         })
 
         if (student) {
 
-            const { registerationNumber, registerationDate, studentClass, phoneNumber, section, studentName, fatherName, motherName, gender, dob, age, alternatePhoneNumber, email, address, town, city, village, district, state, pincode, landMark } = student
+            const { registerationNumber, registerationDate, studentClass, phoneNumber, section, studentName, fatherName, motherName, gender, dob, age, alternatePhoneNumber, email, address, town, city, village, district, state, pincode, landMark, schoolName } = student
 
             res.status(201).json({
                 registerationNumber,
@@ -80,7 +81,8 @@ const createStudent = asyncHandler(async (req, res) => {
                 state,
                 pincode,
                 landMark,
-                monthlyFees
+                monthlyFees,
+                schoolName
             })
 
         }
@@ -100,28 +102,31 @@ const updateStudent = asyncHandler(async (req, res) => {
     const student = await Student.findOne({ registerationNumber: registerationNumber })
 
     if (student) {
+
         const { registerationNumber, registerationDate, studentClass, phoneNumber, section, studentName, fatherName, motherName, gender, dob, age, alternatePhoneNumber, email, address, town, city, district, state, pincode, village, landMark } = await req.body
-        student.registerationNumber = registerationNumber || registerationNumber;
-        student.registerationDate = registerationDate || registerationDate;
-        student.studentClass = studentClass || studentClass;
-        student.phoneNumber = phoneNumber || phoneNumber;
-        student.section = section || section;
-        student.studentName = studentName || studentName;
-        student.fatherName = fatherName || fatherName;
-        student.motherName = motherName || motherName;
-        student.gender = gender || gender;
-        student.dob = dob || dob;
-        student.age = age || age;
-        student.alternatePhoneNumber = alternatePhoneNumber || alternatePhoneNumber;
-        student.email = email || email;
-        student.address = address || address;
-        student.town = town || town;
-        student.city = city || city;
-        student.district = district || district;
-        student.state = state || state;
-        student.pincode = pincode || pincode;
-        student.village = village || village;
-        student.landMark = landMark || landMark;
+
+        student.registerationNumber = req.body.registerationNumber || registerationNumber;
+        student.registerationDate = req.body.registerationDate || registerationDate;
+        student.studentClass = req.body.studentClass || studentClass;
+        student.phoneNumber = req.body.phoneNumber || phoneNumber;
+        student.section = req.body.section || section;
+        student.studentName = req.body.studentName || studentName;
+        student.fatherName = req.body.fatherName || fatherName;
+        student.motherName = req.body.motherName || motherName;
+        student.gender = req.body.gender || gender;
+        student.dob = req.body.dob || dob;
+        student.age = req.body.age || age;
+        student.alternatePhoneNumber = req.body.alternatePhoneNumber || alternatePhoneNumber;
+        student.email = req.body.email || email;
+        student.address = req.body.address || address;
+        student.town = req.body.town || town;
+        student.city = req.body.city || city;
+        student.district = req.body.district || district;
+        student.state = req.body.state || state;
+        student.pincode = req.body.pincode || pincode;
+        student.village = req.body.village || village;
+        student.landMark = req.body.landMark || landMark;
+
 
         const updatedStudent = await student.save()
 
@@ -147,7 +152,6 @@ const updateStudent = asyncHandler(async (req, res) => {
             Pincode: updatedStudent.pincode,
             Village: updatedStudent.village,
             LandMark: updatedStudent.landMark,
-
         })
 
     }
@@ -155,11 +159,10 @@ const updateStudent = asyncHandler(async (req, res) => {
         res.status(404)
         throw new Error("Student not found")
     }
-
-
-
-
 })
+
+// Get all students
+
 
 module.exports = {
     createStudent,
