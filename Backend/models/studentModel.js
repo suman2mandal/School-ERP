@@ -5,7 +5,7 @@ const mongoose = require('mongoose') //For operations in mongodb
 //Defining the student schema
 const studentSchema = mongoose.Schema({
     registerationNumber: {
-        type: Number,
+        type: String,
         required: [true, "Please add a registeration number"],
         unique: true
     },
