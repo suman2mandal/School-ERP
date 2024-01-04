@@ -26,6 +26,39 @@ const addFees = asyncHandler(async (req, res) => {
 
 })
 
+// Update fees
+
+const updateFees = asyncHandler(async (req, res) => {
+    const { studentClass } = req.params
+
+    const fees = await Fees.findOne({ studentClass: studentClass })
+
+    if (fees) {
+        const { feesAmount } = await req.body
+
+        fees.feesAmount = req.body.feesAmount || feesAmount
+
+        const updatedFees = await fees.save()
+
+        if (updateFees) {
+            res.status(201).json({
+                FeesAmount: updatedFees.feesAmount
+            })
+        }
+        else {
+            res.status(404)
+            throw new Error("Fees not updated")
+        }
+
+    }
+    else {
+        res.status(404)
+        throw new Error("Fees not found")
+    }
+
+})
+
 module.exports = {
-    addFees
+    addFees,
+    updateFees
 }
