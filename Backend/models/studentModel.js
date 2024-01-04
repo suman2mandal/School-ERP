@@ -6,7 +6,8 @@ const mongoose = require('mongoose') //For operations in mongodb
 const studentSchema = mongoose.Schema({
     registerationNumber: {
         type: Number,
-        required: [true, "Please add a registeration number"]
+        required: [true, "Please add a registeration number"],
+        unique: true
     },
     registerationDate: {
         type: Date,
