@@ -10,8 +10,8 @@ const cookieParser = require("cookie-parser")
 const path = require("path")
 
 // Import routes from the routes folder
-// const userRoute = require("./routes/userRoutes");
-// const productRoute = require("./routes/productRoutes")
+const studentRoute = require("./routes/studentRoutes");
+const feesRoute = require("./routes/feesRoutes")
 // const contactUsRoute = require("./routes/contactRoutes")
 
 // Define the server's port, using the specified port or default to 27017
@@ -41,8 +41,8 @@ mongoose
         // Use middlewares imported from middlewares folder
 
         // Middleware to use the routes defined in the routes folder
-        // apiServer.use('/api/users', userRoute);
-        // apiServer.use('/api/products', productRoute);
+        apiServer.use('/api/students', studentRoute);
+        apiServer.use('/api/fees', feesRoute);
         // apiServer.use('/api/contactus/', contactUsRoute)
 
         // Start the Express server, listening on the specified port
