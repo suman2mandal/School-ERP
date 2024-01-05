@@ -14,6 +14,7 @@ import path from "path";
 import studentRoute from "./routes/studentRoutes.js";
 import feesRoute from "./routes/feesRoutes.js";
 import schoolRoute from "./routes/schoolRoutes.js"
+import empRoute from "./routes/empRoutes.js"
 // import contactUsRoute from "./routes/contactRoutes.js";
 
 // Define the server's port, using the specified port or default to 5000
@@ -61,6 +62,9 @@ mongoose
 
         // Middleware to use the school routes
         apiServer.use("/api/school", schoolRoute)
+
+        // Middleware to use emp routes
+        apiServer.use("/api/emp", empRoute)
 
         // Uncomment and add similar middleware for contactUsRoute if needed
         // apiServer.use('/api/contactus/', contactUsRoute)

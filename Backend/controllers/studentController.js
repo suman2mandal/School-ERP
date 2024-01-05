@@ -43,7 +43,6 @@ const createStudent = asyncHandler(async (req, res) => {
 
 const updateStudent = asyncHandler(async (req, res) => {
     const { registerationNumber } = req.params;
-    console.log(registerationNumber)
     const student = await Student.findOne({ registerationNumber });
 
     if (!student) {

@@ -107,8 +107,8 @@ const studentSchema = mongoose.Schema({
     }
 });
 
-// Storing the student into a variable
+
 const Student = mongoose.model("Student", studentSchema);
 
-// Exporting the student schema, so that we can use it in different files
+
 export default Student;
