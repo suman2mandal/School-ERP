@@ -1,5 +1,5 @@
 import express from "express";
-import { addFees, updateFees } from "../controllers/feesController.js";
+import { addFees, deleteFees, readFees, updateFees } from "../controllers/feesController.js";
 
 const router = express.Router();
 
@@ -7,6 +7,12 @@ const router = express.Router();
 router.post('/addfees', addFees);
 
 // Update fees
-router.post('/updatefees/:studentClass', updateFees);
+router.post('/updatefees', updateFees);
+
+// Read fees
+router.post('/readfees', readFees)
+
+// Delete fees
+router.post('/deletefees', deleteFees)
 
 export default router;

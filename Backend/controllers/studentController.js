@@ -26,9 +26,9 @@ const createStudent = asyncHandler(async (req, res) => {
     }
 
     const { studentClass } = req.body;
-    const feesInfo = await Fees.findOne({ studentClass });
-    const monthlyFees = feesInfo?.feesAmount || 0;
     const { school } = await req.body
+    const feesInfo = await Fees.findOne({ studentClass, school });
+    const monthlyFees = feesInfo?.feesAmount || 0;
     const studentData = { ...req.body, monthlyFees, school };
 
     try {
@@ -85,4 +85,36 @@ const mapStudentData = (student) => {
     }, {});
 };
 
-export { createStudent, updateStudent };
+const readStudents = asyncHandler(async (req, res) => {
+    const students = await Student.find({ school: req.body.school })
+    if (students) {
+        res.status("200").json({ students })
+    }
+    else {
+        res.status("404").json({ error: "No students found" })
+    }
+})
+
+const readOneStudent = asyncHandler(async (req, res) => {
+    const student = await Student.find({ registerationNumber: req.body.registerationNumber })
+    if (student) {
+        res.status("200").json({ student })
+    }
+    else {
+        res.status("404").json({ error: "No student found" })
+    }
+})
+
+const deleteStudent = asyncHandler(async (req, res) => {
+    const studentToDelete = await Student.find({ registerationNumber: req.body.registerationNumber })
+
+    if (studentToDelete) {
+        await Student.deleteOne()
+        res.status("200").json({ studentToDelete })
+    }
+    else {
+        res.status("404").json({ error: "No student found" })
+    }
+})
+
+export { createStudent, updateStudent, readStudents, readOneStudent, deleteStudent };

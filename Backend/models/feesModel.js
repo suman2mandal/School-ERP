@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
 const feesSchema = mongoose.Schema({
+    school: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: "School"
+    },
     studentClass: {
         type: Number,
         required: [true, "Please add class"],
