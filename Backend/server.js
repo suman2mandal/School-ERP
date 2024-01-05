@@ -44,7 +44,7 @@ apiServer.use(
 );
 
 // Middleware for serving static files (e.g., file uploads)
-apiServer.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// apiServer.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Connect to the MongoDB database using the provided URI in the environment variables
 mongoose

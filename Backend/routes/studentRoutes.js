@@ -7,6 +7,6 @@ const router = express.Router();
 router.post('/register', createStudent);
 
 // Update student
-router.post("/student/:registrationNumber", updateStudent);
+router.post("/student/:registerationNumber", updateStudent);
 
 export default router;

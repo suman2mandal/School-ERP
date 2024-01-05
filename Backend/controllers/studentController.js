@@ -43,6 +43,7 @@ const createStudent = asyncHandler(async (req, res) => {
 
 const updateStudent = asyncHandler(async (req, res) => {
     const { registerationNumber } = req.params;
+    console.log(registerationNumber)
     const student = await Student.findOne({ registerationNumber });
 
     if (!student) {
@@ -60,6 +61,10 @@ const updateStudent = asyncHandler(async (req, res) => {
     fieldsToUpdate.forEach(field => {
         student[field] = req.body[field] || student[field];
     });
+
+    const { studentClass } = req.body;
+    const feesInfo = await Fees.findOne({ studentClass });
+    student.monthlyFees = feesInfo?.feesAmount || 0;
 
     const updatedStudent = await student.save();
     const responseData = mapStudentData(updatedStudent);
