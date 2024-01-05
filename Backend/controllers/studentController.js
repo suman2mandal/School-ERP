@@ -11,7 +11,7 @@ const createStudent = asyncHandler(async (req, res) => {
         'registerationNumber', 'registerationDate', 'studentClass', 'phoneNumber',
         'section', 'studentName', 'fatherName', 'motherName', 'gender', 'dob', 'age',
         'alternatePhoneNumber', 'email', 'address', 'town', 'district', 'state',
-        'pincode', 'landMark', 'schoolName',
+        'pincode', 'landMark'
     ];
 
     if (!validateRequiredFields(req.body, requiredFields)) {
@@ -28,8 +28,8 @@ const createStudent = asyncHandler(async (req, res) => {
     const { studentClass } = req.body;
     const feesInfo = await Fees.findOne({ studentClass });
     const monthlyFees = feesInfo?.feesAmount || 0;
-
-    const studentData = { ...req.body, monthlyFees };
+    const { school } = await req.body
+    const studentData = { ...req.body, monthlyFees, school };
 
     try {
         const student = await Student.create(studentData);
@@ -76,7 +76,7 @@ const mapStudentData = (student) => {
         'registerationNumber', 'registerationDate', 'studentClass', 'phoneNumber',
         'section', 'studentName', 'fatherName', 'motherName', 'gender', 'dob', 'age',
         'alternatePhoneNumber', 'email', 'address', 'town', 'city', 'district', 'state',
-        'pincode', 'village', 'landMark', 'monthlyFees', 'schoolName',
+        'pincode', 'village', 'landMark', 'monthlyFees'
     ];
 
     return fieldsToInclude.reduce((data, field) => {

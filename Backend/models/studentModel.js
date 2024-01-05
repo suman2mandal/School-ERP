@@ -2,6 +2,11 @@ import mongoose from 'mongoose';
 
 // Defining the student schema
 const studentSchema = mongoose.Schema({
+    school: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: "School"
+    },
     registerationNumber: {
         type: String,
         required: [true, "Please add a registeration number"],
@@ -99,11 +104,7 @@ const studentSchema = mongoose.Schema({
     landMark: {
         type: String,
         required: [true, "Please add the landmark"],
-    },
-    schoolName: {
-        type: String,
-        required: [true, "Please add a schoolname"],
-    },
+    }
 });
 
 // Storing the student into a variable
