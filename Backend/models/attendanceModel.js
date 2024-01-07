@@ -16,6 +16,11 @@ const AttendanceSchema = new mongoose.Schema({
     staffDetails: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Emp'
+    },
+    schoolDetails: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'School',
+        required: true
     }
 });
 
