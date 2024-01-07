@@ -1,4 +1,4 @@
-// Load environment variables from a .env file into process.env
+// Load environment variables from a ..env file into process..env
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -15,6 +15,7 @@ import studentRoute from "./routes/studentRoutes.js";
 import feesRoute from "./routes/feesRoutes.js";
 import schoolRoute from "./routes/schoolRoutes.js"
 import empRoute from "./routes/empRoutes.js"
+import attendanceRoute from "./routes/attendanceRoutes.js"
 // import contactUsRoute from "./routes/contactRoutes.js";
 
 // Define the server's port, using the specified port or default to 5000
@@ -65,6 +66,9 @@ mongoose
 
         // Middleware to use emp routes
         apiServer.use("/api/emp", empRoute)
+
+        //Middleware to use attendance routes
+        apiServer.use("/api/attendance", attendanceRoute)
 
         // Uncomment and add similar middleware for contactUsRoute if needed
         // apiServer.use('/api/contactus/', contactUsRoute)
