@@ -1,11 +1,6 @@
 import mongoose from "mongoose"
 
 const studentFeesSchema = mongoose.Schema({
-    student: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref: "Student"
-    },
     school: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -27,25 +22,29 @@ const studentFeesSchema = mongoose.Schema({
         type: Number,
         required: [true, "Please enter the class of student"]
     },
-    studentSection: {
-        type: Number,
+    section: {
+        type: String,
         required: [true, "Please enter the section of the student"]
     },
     otherFeesOne: {
         type: Number,
-        required: false
+        required: false,
+        default: 0
     },
     otherFeesTwo: {
         type: Number,
-        required: false
+        required: false,
+        default: 0
     },
     otherFeesThree: {
         type: Number,
-        required: false
+        required: false,
+        default: 0
     },
     otherFeesFour: {
         type: Number,
-        required: false
+        required: false,
+        default: 0
     },
     amountToPay: {
         type: Number,
@@ -66,10 +65,17 @@ const studentFeesSchema = mongoose.Schema({
     payMode: {
         type: String,
         required: [true, "Please add payment mode"]
+    },
+    month: {
+        type: Number,
+        required: [true, "Please add month for which fees is received"]
+    },
+    year: {
+        type: Number,
+        required: [true, "Please add year for which fees is received"]
     }
-
 
 })
 
-const StudentFees = mongoose.Model("StudentFees", studentFeesSchema)
-module.exports = StudentFees
+const StudentFees = mongoose.model("StudentFees", studentFeesSchema)
+export { StudentFees }
