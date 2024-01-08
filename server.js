@@ -10,7 +10,7 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import path from "path";
 
-// Import routes from the routes folder
+// Import routes from the routes folder.
 import studentRoute from "./routes/studentRoutes.js";
 import feesRoute from "./routes/feesRoutes.js";
 import schoolRoute from "./routes/schoolRoutes.js"
