@@ -1,16 +1,25 @@
-// This will be only for the use of web app owner -- Owner will decide the school name and a password 
-const mongoose = require("mongoose")
-
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs"
 const schoolSchema = mongoose.Schema({
     schoolName: {
         type: String,
-        required: [true, "Please add school name"]
+        required: [true, "Please add school name"],
     },
     schoolPassword: {
         type: String,
-        required: [true, "Please add school password"]
+        required: [true, "Please add school password"],
+    },
+});
+
+schoolSchema.pre("save", async function (next) {
+    if (!this.isModified("schoolPassword")) {
+        return next()
     }
+    const passwordSalt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(this.schoolPassword, passwordSalt)
+    this.schoolPassword = hashedPassword
 })
 
-const School = mongoose.model("School", schoolSchema)
-module.exports = School
+const School = mongoose.model("School", schoolSchema);
+
+export default School;

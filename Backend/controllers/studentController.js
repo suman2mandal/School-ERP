@@ -1,173 +1,119 @@
-const asyncHandler = require('express-async-handler')
-const Student = require("../models/studentModel")
-const Fees = require("../models/feesModel")
+import asyncHandler from 'express-async-handler';
+import Student from '../models/studentModel.js';
+import Fees from '../models/feesModel.js';
 
-// Create student logic
+const validateRequiredFields = (body, requiredFields) => {
+    return requiredFields.every(field => body[field]);
+};
 
 const createStudent = asyncHandler(async (req, res) => {
+    const requiredFields = [
+        'registerationNumber', 'registerationDate', 'studentClass', 'phoneNumber',
+        'section', 'studentName', 'fatherName', 'motherName', 'gender', 'dob', 'age',
+        'alternatePhoneNumber', 'email', 'address', 'town', 'district', 'state',
+        'pincode', 'landMark'
+    ];
 
-    // Destructuring data from the request
-    const { registerationNumber, registerationDate, studentClass, phoneNumber, section, studentName, fatherName, motherName, gender, dob, age, alternatePhoneNumber, email, address, town, city, district, state, pincode, village, landMark, schoolName } = await req.body
-
-    // Validation in the backend
-    if (!registerationNumber || !registerationDate || !studentClass || !phoneNumber || !section || !studentName || !fatherName || !motherName || !gender || !dob || !age || !alternatePhoneNumber || !email || !address || !town || !district || !state || !pincode || !landMark || !schoolName) {
-        res.status(400)
-        throw new Error("Please fill all the fields")
+    if (!validateRequiredFields(req.body, requiredFields)) {
+        res.status(400).json({ error: 'Please fill all the required fields' });
+        return;
     }
 
+    const { city, village } = req.body;
     if (!city && !village) {
-        res.status(400)
-        throw new Error("Please add city or village")
+        res.status(400).json({ error: 'Please add city or village' });
+        return;
     }
 
-    // Getting fees and populating it
+    const { studentClass } = req.body;
+    const { school } = await req.body
+    const feesInfo = await Fees.findOne({ studentClass, school });
+    const monthlyFees = feesInfo?.feesAmount || 0;
+    const studentData = { ...req.body, monthlyFees, school };
+
     try {
-        const feesInfo = await Fees.findOne({ studentClass: studentClass });
-
-        if (feesInfo && feesInfo.feesAmount) {
-            const { feesAmount } = feesInfo
-            var monthlyFees = feesAmount
-        }
-
-        const student = await Student.create({
-            registerationNumber,
-            registerationDate,
-            studentClass,
-            phoneNumber,
-            section,
-            studentName,
-            fatherName,
-            motherName,
-            gender,
-            dob,
-            age,
-            alternatePhoneNumber,
-            email,
-            address,
-            town,
-            city,
-            village,
-            district,
-            state,
-            pincode,
-            landMark,
-            monthlyFees,
-            schoolName
-        })
-
-        if (student) {
-
-            const { registerationNumber, registerationDate, studentClass, phoneNumber, section, studentName, fatherName, motherName, gender, dob, age, alternatePhoneNumber, email, address, town, city, village, district, state, pincode, landMark, schoolName } = student
-
-            res.status(201).json({
-                registerationNumber,
-                registerationDate,
-                studentClass,
-                phoneNumber,
-                section,
-                studentName,
-                fatherName,
-                motherName,
-                gender,
-                dob,
-                age,
-                alternatePhoneNumber,
-                email,
-                address,
-                town,
-                city,
-                village,
-                district,
-                state,
-                pincode,
-                landMark,
-                monthlyFees,
-                schoolName
-            })
-
-        }
-
+        const student = await Student.create(studentData);
+        const responseData = mapStudentData(student);
+        res.status(201).json(responseData);
     } catch (error) {
-        console.error("Error creating student:", error);
-        res.status(500).json({ error: "Student creation failed" });
+        console.error('Error creating student:', error);
+        res.status(500).json({ error: 'Student creation failed' });
     }
-
-})
-
-// Update the student
+});
 
 const updateStudent = asyncHandler(async (req, res) => {
-    const { registerationNumber } = req.params
+    const { registerationNumber } = req.params;
+    const student = await Student.findOne({ registerationNumber });
 
-    const student = await Student.findOne({ registerationNumber: registerationNumber })
+    if (!student) {
+        res.status(404).json({ error: 'Student not found' });
+        return;
+    }
 
-    if (student) {
+    const fieldsToUpdate = [
+        'registerationNumber', 'registerationDate', 'studentClass', 'phoneNumber',
+        'section', 'studentName', 'fatherName', 'motherName', 'gender', 'dob', 'age',
+        'alternatePhoneNumber', 'email', 'address', 'town', 'city', 'district', 'state',
+        'pincode', 'village', 'landMark',
+    ];
 
-        const { registerationNumber, registerationDate, studentClass, phoneNumber, section, studentName, fatherName, motherName, gender, dob, age, alternatePhoneNumber, email, address, town, city, district, state, pincode, village, landMark } = await req.body
+    fieldsToUpdate.forEach(field => {
+        student[field] = req.body[field] || student[field];
+    });
 
-        student.registerationNumber = req.body.registerationNumber || registerationNumber;
-        student.registerationDate = req.body.registerationDate || registerationDate;
-        student.studentClass = req.body.studentClass || studentClass;
-        student.phoneNumber = req.body.phoneNumber || phoneNumber;
-        student.section = req.body.section || section;
-        student.studentName = req.body.studentName || studentName;
-        student.fatherName = req.body.fatherName || fatherName;
-        student.motherName = req.body.motherName || motherName;
-        student.gender = req.body.gender || gender;
-        student.dob = req.body.dob || dob;
-        student.age = req.body.age || age;
-        student.alternatePhoneNumber = req.body.alternatePhoneNumber || alternatePhoneNumber;
-        student.email = req.body.email || email;
-        student.address = req.body.address || address;
-        student.town = req.body.town || town;
-        student.city = req.body.city || city;
-        student.district = req.body.district || district;
-        student.state = req.body.state || state;
-        student.pincode = req.body.pincode || pincode;
-        student.village = req.body.village || village;
-        student.landMark = req.body.landMark || landMark;
+    const { studentClass } = req.body;
+    const feesInfo = await Fees.findOne({ studentClass });
+    student.monthlyFees = feesInfo?.feesAmount || 0;
 
+    const updatedStudent = await student.save();
+    const responseData = mapStudentData(updatedStudent);
+    res.status(200).json(responseData);
+});
 
-        const updatedStudent = await student.save()
+const mapStudentData = (student) => {
+    const fieldsToInclude = [
+        'registerationNumber', 'registerationDate', 'studentClass', 'phoneNumber',
+        'section', 'studentName', 'fatherName', 'motherName', 'gender', 'dob', 'age',
+        'alternatePhoneNumber', 'email', 'address', 'town', 'city', 'district', 'state',
+        'pincode', 'village', 'landMark', 'monthlyFees'
+    ];
 
-        res.status(200).json({
-            RegisterationNumber: updatedStudent.registerationNumber,
-            RegisterationDate: updatedStudent.registerationDate,
-            StudentClass: updatedStudent.studentClass,
-            PhoneNumber: updatedStudent.phoneNumber,
-            Section: updatedStudent.section,
-            StudentName: updatedStudent.studentName,
-            FatherName: updatedStudent.fatherName,
-            MotherName: updatedStudent.motherName,
-            Gender: updatedStudent.gender,
-            DOB: updatedStudent.dob,
-            Age: updatedStudent.age,
-            AlternatePhoneNumber: updatedStudent.alternatePhoneNumber,
-            Email: updatedStudent.email,
-            Address: updatedStudent.address,
-            Town: updatedStudent.town,
-            City: updatedStudent.city,
-            District: updatedStudent.district,
-            State: updatedStudent.state,
-            Pincode: updatedStudent.pincode,
-            Village: updatedStudent.village,
-            LandMark: updatedStudent.landMark,
-        })
+    return fieldsToInclude.reduce((data, field) => {
+        data[field] = student[field];
+        return data;
+    }, {});
+};
 
+const readStudents = asyncHandler(async (req, res) => {
+    const students = await Student.find({ school: req.body.school })
+    if (students) {
+        res.status("200").json({ students })
     }
     else {
-        res.status(404)
-        throw new Error("Student not found")
+        res.status("404").json({ error: "No students found" })
     }
 })
 
-// Get all students
+const readOneStudent = asyncHandler(async (req, res) => {
+    const student = await Student.find({ registerationNumber: req.body.registerationNumber })
+    if (student) {
+        res.status("200").json({ student })
+    }
+    else {
+        res.status("404").json({ error: "No student found" })
+    }
+})
 
+const deleteStudent = asyncHandler(async (req, res) => {
+    const studentToDelete = await Student.find({ registerationNumber: req.body.registerationNumber })
 
-module.exports = {
-    createStudent,
-    updateStudent
-}
+    if (studentToDelete) {
+        await Student.deleteOne()
+        res.status("200").json({ studentToDelete })
+    }
+    else {
+        res.status("404").json({ error: "No student found" })
+    }
+})
 
-
-
+export { createStudent, updateStudent, readStudents, readOneStudent, deleteStudent };

@@ -1,11 +1,18 @@
-const express = require("express")
-const { addFees, updateFees } = require("../controllers/feesController")
-const router = express.Router()
+import express from "express";
+import { addFees, deleteFees, readFees, updateFees } from "../controllers/feesController.js";
+
+const router = express.Router();
 
 // Add fees
-router.post('/addfees', addFees)
+router.post('/addfees', addFees);
 
 // Update fees
-router.post('/updatefees/:studentClass', updateFees)
+router.post('/updatefees', updateFees);
 
-module.exports = router
+// Read fees
+router.post('/readfees', readFees)
+
+// Delete fees
+router.post('/deletefees', deleteFees)
+
+export default router;

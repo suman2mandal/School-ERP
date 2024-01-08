@@ -1,64 +1,78 @@
-const asyncHandler = require('express-async-handler')
-const Fees = require("../models/feesModel")
+import asyncHandler from 'express-async-handler';
+import Fees from '../models/feesModel.js';
+
 // Add fees component
 const addFees = asyncHandler(async (req, res) => {
-    const { studentClass, feesAmount } = await req.body
+    const { studentClass, feesAmount, school } = req.body;
 
-    if (!studentClass || !feesAmount) {
-        res.status(400)
-        throw new Error("Please add class and fees amount")
+    if (!studentClass || !feesAmount || !school) {
+        res.status(400).json({ error: "Please fill all required fields" });
+        return;
     }
 
     const fees = await Fees.create({
+        school,
         studentClass,
-        feesAmount
-    })
+        feesAmount,
+    });
 
     if (fees) {
-        const { studentClass, feesAmount } = fees
-        res.status(201).json({
-            studentClass, feesAmount
+        const { studentClass, feesAmount, school } = fees;
+        res.status(201).json({ studentClass, feesAmount, school });
+    } else {
+        res.status(400).json({ error: "Fees not added" });
+    }
+});
+
+// Update fees
+const updateFees = asyncHandler(async (req, res) => {
+
+    const { feesAmount, school, studentClass } = req.body
+
+    const fees = await Fees.findOne({ school, studentClass });
+
+    if (!fees) {
+        res.status(404).json({ error: "Fees not found" });
+        return;
+    }
+
+
+    fees.feesAmount = feesAmount || fees.feesAmount;
+
+
+    const updatedFees = await fees.save();
+
+    if (updatedFees) {
+        res.status(201).json({ FeesAmount: updatedFees.feesAmount, StudentClass: updateFees.studentClass });
+    } else {
+        res.status(404).json({ error: "Fees not updated" });
+    }
+});
+
+// Read fees
+const readFees = asyncHandler(async (req, res) => {
+    const feesCredentials = await Fees.find({ school: req.body.school })
+    if (feesCredentials) {
+        res.status("200").json({
+            feesCredentials
         })
     }
     else {
-        res.status(400).json({ error: "Fees not added" })
+        res.status("400").json({ error: "No fees data found" })
     }
-
 })
 
-// Update fees
-
-const updateFees = asyncHandler(async (req, res) => {
-    const { studentClass } = req.params
-
-    const fees = await Fees.findOne({ studentClass: studentClass })
-
-    if (fees) {
-        const { feesAmount } = await req.body
-
-        fees.feesAmount = req.body.feesAmount || feesAmount
-
-        const updatedFees = await fees.save()
-
-        if (updateFees) {
-            res.status(201).json({
-                FeesAmount: updatedFees.feesAmount
-            })
-        }
-        else {
-            res.status(404)
-            throw new Error("Fees not updated")
-        }
-
+// Delete fees
+const deleteFees = asyncHandler(async (req, res) => {
+    const { school, studentClass } = req.body
+    const feesToDelete = await Fees.findOne({ school, studentClass });
+    if (feesToDelete) {
+        await feesToDelete.deleteOne()
+        res.status("201").json({ feesToDelete })
     }
     else {
-        res.status(404)
-        throw new Error("Fees not found")
+        res.status("404").json({ error: "No fees found" })
     }
-
 })
 
-module.exports = {
-    addFees,
-    updateFees
-}
+export { addFees, updateFees, readFees, deleteFees };
