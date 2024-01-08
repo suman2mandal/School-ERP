@@ -16,11 +16,11 @@ const retrieveAttendance = async (req, res) => {
     try {
         const attendance = await Attendance.findById(req.params.id);
         if (!attendance) {
-            return res.status(404).send();
+            return res.status(404).send(`no data found related to ${req.params.id}`);
         }
         res.send(attendance);
     } catch (error) {
-        res.status(500).send();
+        res.status(500).send(`Error in  ${req.params.id}`);
     }
 };
 
