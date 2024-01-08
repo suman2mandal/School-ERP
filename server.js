@@ -54,6 +54,9 @@ apiServer.use(
 mongoose
     .connect(process.env.mongodbUri)
     .then(() => {
+        apiServer.get('/', (req, res) => {
+            res.send("Welcome 👋 to School ERP 👩‍🏫");
+        });
         // Use middlewares imported from the middlewares folder
 
         // Middleware to use the student routes
