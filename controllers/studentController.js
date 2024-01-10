@@ -85,14 +85,14 @@ const mapStudentData = (student) => {
 };
 
 const readStudents = asyncHandler(async (req, res) => {
-    const students = await Student.find({ school: req.body.school })
-    if (students) {
-        res.status("200").json({ students })
+    const students = await Student.find({ school: req.body.school, studentClass: req.body.studentClass })
+    if (students && students.length > 0) {
+        res.status(200).json({ students });
+    } else {
+        res.status(404).json({ error: "No students found" });
     }
-    else {
-        res.status("404").json({ error: "No students found" })
-    }
-})
+});
+
 
 const readOneStudent = asyncHandler(async (req, res) => {
     const student = await Student.find({ registerationNumber: req.body.registerationNumber })
