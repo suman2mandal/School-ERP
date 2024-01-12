@@ -10,7 +10,7 @@ router.post('/register', createStudent);
 router.post("/student/:registerationNumber", updateStudent);
 
 // Read all students
-router.post("/allstudents", readStudents)
+router.get("/allstudents", readStudents)
 
 // Read one student
 router.post("/onestudent", readOneStudent)

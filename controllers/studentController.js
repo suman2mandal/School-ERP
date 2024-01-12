@@ -85,22 +85,23 @@ const mapStudentData = (student) => {
 };
 
 const readStudents = asyncHandler(async (req, res) => {
-    const students = await Student.find({ school: req.body.school })
+    const students = await Student.find()
+    console.log("hit");
     if (students) {
-        res.status("200").json({ students })
+        res.status(200).json({ students })
     }
     else {
-        res.status("404").json({ error: "No students found" })
+        res.status(404).json({ error: "No students found" })
     }
 })
 
 const readOneStudent = asyncHandler(async (req, res) => {
     const student = await Student.find({ registerationNumber: req.body.registerationNumber })
     if (student) {
-        res.status("200").json({ student })
+        res.status(200).json({ student })
     }
     else {
-        res.status("404").json({ error: "No student found" })
+        res.status(404).json({ error: "No student found" })
     }
 })
 
@@ -109,10 +110,10 @@ const deleteStudent = asyncHandler(async (req, res) => {
 
     if (studentToDelete) {
         await Student.deleteOne()
-        res.status("200").json({ studentToDelete })
+        res.status(200).json({ studentToDelete })
     }
     else {
-        res.status("404").json({ error: "No student found" })
+        res.status(404).json({ error: "No student found" })
     }
 })
 
