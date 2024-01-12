@@ -9,7 +9,7 @@ router.post('/register', createStudent);
 // Update student
 router.post("/student/:registerationNumber", updateStudent);
 
-// Read all students with class and school
+// Read all students (for developers)
 router.get("/students", readStudents)
 
 // Read all students - in the whole school
