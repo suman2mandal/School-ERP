@@ -1,5 +1,5 @@
 import express from "express";
-import { createStudent, deleteStudent, readOneStudent, readAllStudents, readStudents, updateStudent } from "../controllers/studentController.js";
+import { createStudent, deleteStudent, readOneStudent, readAllStudents, readStudents, updateStudent, readAllClassStudents } from "../controllers/studentController.js";
 
 const router = express.Router();
 
@@ -10,10 +10,12 @@ router.post('/register', createStudent);
 router.post("/student/:registerationNumber", updateStudent);
 
 // Read all students with class and school
-router.post("/students", readStudents)
+router.get("/students", readStudents)
 
 // Read all students - in the whole school
 router.post("/allstudents", readAllStudents)
+
+router.post("/readAllClassStudents", readAllClassStudents)
 
 // Read one student
 router.post("/onestudent", readOneStudent)
