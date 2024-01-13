@@ -52,7 +52,7 @@ const loginSchool = asyncHandler(async (req, res) => {
     const school = await School.findOne({ schoolId })
 
     if (!school) {
-        res.status(404).json({ error: "No school found" })
+        res.status(201).json({ error: "No school found" })
     }
 
     const passwordIsCorrect = await bcrypt.compare(schoolPassword, school.schoolPassword)
