@@ -12,10 +12,10 @@ const generateToken = (id) => {
 
 const addSchool = asyncHandler(async (req, res) => {
 
-    const { schoolName, schoolPassword } = await req.body
+    const { schoolId, schoolPassword } = await req.body
 
     const school = await School.create({
-        schoolName,
+        schoolId,
         schoolPassword
     })
 
@@ -33,7 +33,7 @@ const addSchool = asyncHandler(async (req, res) => {
         const { schoolName, schoolPassword } = school
 
         res.status(201).json({
-            schoolName,
+            schoolId,
             schoolPassword
         })
     }
@@ -45,4 +45,40 @@ const addSchool = asyncHandler(async (req, res) => {
 
 })
 
-export { addSchool }
+const loginSchool = asyncHandler(async (req, res) => {
+    const { schoolId, schoolPassword } = req.body
+
+    // Check if school exists
+    const school = await School.findOne({ schoolId })
+
+    if (!school) {
+        res.status(201).json({ error: "No school found" })
+    }
+
+    const passwordIsCorrect = await bcrypt.compare(schoolPassword, school.schoolPassword)
+
+    const schoolLoginToken = generateToken(school._id)
+
+    //Send http only cookie
+    res.cookie("Token", schoolLoginToken, {
+        path: '/',
+        httpOnly: 'true',
+        expires: new Date(Date.now() + 1000 * 86400),
+        sameSite: 'none',
+        secure: true
+    })
+
+    if (passwordIsCorrect) {
+        res.status(200).json({
+            schoolId,
+            schoolPassword
+        })
+    }
+    else {
+        res.status(400).json({ error: "Wrong password" })
+    }
+})
+
+
+
+export { addSchool, loginSchool }

@@ -1,20 +1,15 @@
 import mongoose from 'mongoose';
 
-// Defining the student schema
+// Defining the student schema based on the FormValues interface
 const studentSchema = mongoose.Schema({
-    school: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref: "School"
-    },
     registerationNumber: {
         type: String,
-        required: [true, "Please add a registeration number"],
+        required: [true, "Please add a registration number"],
         unique: true,
     },
     registerationDate: {
         type: Date,
-        required: [true, "Please add a registeration date"],
+        required: [true, "Please add a registration date"],
     },
     studentClass: {
         type: Number,
@@ -53,49 +48,36 @@ const studentSchema = mongoose.Schema({
         type: Date,
         required: [true, "Please add date of birth"],
     },
-    age: {
-        type: Number,
-        required: [true, "Please add age of the student"],
-    },
     alternatePhoneNumber: {
         type: String,
         required: [false],
     },
     email: {
         type: String,
-        required: [true, "Please add a email"],
+        required: [true, "Please add an email"],
         trim: true,
         match: [
             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, "Please enter a valid email"
         ]
     },
-    // According to classwise and operator will select a class and fees will be automatically stored for the student
-    monthlyFees: {
-        type: Number,
-        required: true,
-        ref: "Fees",
-    },
     address: {
         type: String,
-        required: [true, "Please add address of the student"],
+        required: [true, "Please add an address of the student"],
     },
     town: {
         type: String,
-        required: [true, "Please add town of the student"],
+        required: [true, "Please add a town of the student"],
     },
     city: {
         type: String,
     },
-    village: {
-        type: String,
-    },
     district: {
         type: String,
-        required: [true, "Please add district of the student"],
+        required: [true, "Please add a district of the student"],
     },
     state: {
         type: String,
-        required: [true, "Please add state of the student"],
+        required: [true, "Please add a state of the student"],
     },
     pincode: {
         type: String,
@@ -104,11 +86,60 @@ const studentSchema = mongoose.Schema({
     landMark: {
         type: String,
         required: [true, "Please add the landmark"],
-    }
+    },
+    rollNumber: {
+        type: Number,
+        required: [true, "Please add the roll number"],
+    },
+    aaadharNumber: {
+        type: String,
+        required: [true, "Please add the aadhar number"],
+    },
+    bloodGroup: {
+        type: String,
+        required: [true, "Please add the blood group"],
+    },
+    category: {
+        type: String,
+        required: [true, "Please add the category"],
+    },
+    religion: {
+        type: String,
+        required: [true, "Please add the religion"],
+    },
+    lastSchoolName: {
+        type: String,
+    },
+    lastClass: {
+        type: String,
+    },
+    lastClassScore: {
+        type: String,
+    },
+    lastClassYear: {
+        type: String,
+    },
+    lastClassTC: {
+        type: String,
+    },
+    lastClassReason: {
+        type: String,
+    },
+    lastClassBoard: {
+        type: String,
+    },
+    lastClassMedium: {
+        type: String,
+    },
+    lastClassSchool: {
+        type: String,
+    },
+    lastClassCity: {
+        type: String,
+    },
 });
-
 
 const Student = mongoose.model("Student", studentSchema);
 
-
 export default Student;
+

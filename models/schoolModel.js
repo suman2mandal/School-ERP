@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs"
 const schoolSchema = mongoose.Schema({
-    schoolName: {
+    schoolId: {
         type: String,
-        required: [true, "Please add school name"],
+        required: [true, "Please add school id"],
     },
     schoolPassword: {
         type: String,
@@ -23,3 +23,5 @@ schoolSchema.pre("save", async function (next) {
 const School = mongoose.model("School", schoolSchema);
 
 export default School;
+
+
