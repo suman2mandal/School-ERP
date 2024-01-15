@@ -2,6 +2,11 @@ import mongoose from 'mongoose';
 
 // Defining the student schema based on the FormValues interface
 const studentSchema = mongoose.Schema({
+    school: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: "School"
+    },
     registerationNumber: {
         type: String,
         required: [true, "Please add a registration number"],
@@ -14,6 +19,12 @@ const studentSchema = mongoose.Schema({
     studentClass: {
         type: Number,
         require: [true, "Please add a class"],
+    },
+    age: {
+        type: Number,
+    },
+    village: {
+        type: String,
     },
     image: {
         type: String,
@@ -59,6 +70,11 @@ const studentSchema = mongoose.Schema({
         match: [
             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, "Please enter a valid email"
         ]
+    },
+    monthlyFees: {
+        type: Number,
+        required: true,
+        ref: "Fees",
     },
     address: {
         type: String,
@@ -109,33 +125,39 @@ const studentSchema = mongoose.Schema({
     },
     lastSchoolName: {
         type: String,
+        default: 'n/a'
     },
     lastClass: {
         type: String,
+        default: 'n/a'
     },
     lastClassScore: {
         type: String,
+        default: 'n/a'
     },
     lastClassYear: {
         type: String,
+        default: 'n/a'
     },
     lastClassTC: {
         type: String,
+        default: 'n/a'
     },
     lastClassReason: {
         type: String,
+        default: 'n/a'
     },
     lastClassBoard: {
         type: String,
+        default: 'n/a'
     },
     lastClassMedium: {
         type: String,
-    },
-    lastClassSchool: {
-        type: String,
+        default: 'n/a'
     },
     lastClassCity: {
         type: String,
+        default: 'n/a'
     },
 });
 

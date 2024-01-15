@@ -7,11 +7,17 @@ const validateRequiredFields = (body, requiredFields) => {
 };
 
 const createStudent = asyncHandler(async (req, res) => {
+
+    const today = new Date();
+
+
     const requiredFields = [
+        'school',
         'registerationNumber', 'registerationDate', 'studentClass', 'phoneNumber',
-        'section', 'studentName', 'fatherName', 'motherName', 'gender', 'dob', 'age',
-        'alternatePhoneNumber', 'email', 'address', 'town', 'district', 'state',
-        'pincode', 'landMark'
+        'section', 'studentName', 'fatherName', 'motherName', 'gender',
+        'alternatePhoneNumber', 'email', 'address', 'town',
+        'district', 'state', 'pincode', 'landMark', 'rollNumber', 'aaadharNumber',
+        'bloodGroup', 'category', 'religion'
     ];
 
     if (!validateRequiredFields(req.body, requiredFields)) {
@@ -19,8 +25,10 @@ const createStudent = asyncHandler(async (req, res) => {
         return;
     }
 
+    const gotDob = req.body['dob'];
+
     const { city, village } = req.body;
-    if (!city && !village) {
+    if (!city || !village) {
         res.status(400).json({ error: 'Please add city or village' });
         return;
     }
@@ -29,7 +37,8 @@ const createStudent = asyncHandler(async (req, res) => {
     const { school } = await req.body
     const feesInfo = await Fees.findOne({ studentClass, school });
     const monthlyFees = feesInfo?.feesAmount || 0;
-    const studentData = { ...req.body, monthlyFees, school };
+    const age = today.getFullYear() - new Date(gotDob).getFullYear();
+    const studentData = { ...req.body, monthlyFees, school, age };
 
     try {
         const student = await Student.create(studentData);
@@ -54,8 +63,10 @@ const updateStudent = asyncHandler(async (req, res) => {
         'registerationNumber', 'registerationDate', 'studentClass', 'phoneNumber',
         'section', 'studentName', 'fatherName', 'motherName', 'gender', 'dob', 'age',
         'alternatePhoneNumber', 'email', 'address', 'town', 'city', 'district', 'state',
-        'pincode', 'village', 'landMark',
+        'pincode', 'village', 'landMark', 'lastSchoolName', 'lastClass', 'lastClassScore',
+        'lastClassYear', 'lastClassTC', 'lastClassReason', 'lastClassBoard', 'lastClassMedium', 'lastClassCity',
     ];
+
 
     fieldsToUpdate.forEach(field => {
         student[field] = req.body[field] || student[field];
@@ -96,23 +107,29 @@ const readStudents = asyncHandler(async (req, res) => {
 })
 
 const readAllClassStudents = asyncHandler(async (req, res) => {
-        const students = await Student.find({ school: req.body.school, studentClass: req.body.studentClass })
-        if (students && students.length > 0) {
-            res.status(200).json({ students });
+    const students = await Student.find({ school: req.body.school, studentClass: req.body.studentClass })
+    if (students && students.length > 0) {
+        res.status(200).json({ students });
+    } else {
+        res.status(404).json({ error: "No students found" });
+    }
+});
+
+const readAllStudents = asyncHandler(async (req, res) => {
+    try {
+        const students = await Student.find({ school: req.body.school });
+        console.log(students)
+
+        if (students.length > 0) {
+            res.status(200).json(students);
         } else {
             res.status(404).json({ error: "No students found" });
         }
-    });
-    
-const readAllStudents = asyncHandler(async (req, res) => {
-    const students = await Student.find({ school: req.body.school })
-    if (students && students.length > 0) {
-        res.status(200).json({ students })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal server error" });
     }
-    else {
-        res.status(404).json({ error: "No students found" })
-    }
-})
+});
 
 const readOneStudent = asyncHandler(async (req, res) => {
     const student = await Student.find({ registerationNumber: req.body.registerationNumber })
@@ -136,4 +153,4 @@ const deleteStudent = asyncHandler(async (req, res) => {
     }
 })
 
-export { createStudent, updateStudent, readStudents, readOneStudent, deleteStudent, readAllStudents,readAllClassStudents };
+export { createStudent, updateStudent, readStudents, readOneStudent, deleteStudent, readAllStudents, readAllClassStudents };
