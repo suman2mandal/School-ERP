@@ -1,45 +1,25 @@
-// Load environment variables from a ..env file into process..env
 import dotenv from "dotenv";
 dotenv.config();
-
-// Import required dependencies
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-import path from "path";
-
-// Import routes from the routes folder.
 import studentRoute from "./routes/studentRoutes.js";
 import feesRoute from "./routes/feesRoutes.js";
 import schoolRoute from "./routes/schoolRoutes.js"
 import empRoute from "./routes/empRoutes.js"
 import attendanceRoute from "./routes/attendanceRoutes.js"
 import studentFeesRoute from "./routes/studentFeesRoutes.js"
-// import contactUsRoute from "./routes/contactRoutes.js";
+import jwt from "jsonwebtoken";
 
-// Define the server's port, using the specified port or default to 5000
 const serverPort = process.env.PORT || 5000;
-
-// Create an instance of the Express application
 const apiServer = express();
-
-// Using installed middlewares for parsing requests.
-
-// Middleware to parse JSON requests
 apiServer.use(express.json());
-
-// Middleware to parse URL-encoded requests
 apiServer.use(express.urlencoded({ extended: false }));
-
-// Additional JSON parsing middleware
 apiServer.use(bodyParser.json());
-
-// Middleware for parsing cookies
 apiServer.use(cookieParser());
 
-// Cross-Origin Resource Sharing (CORS) middleware configuration
 apiServer.use(
     cors({
         origin: ["http://localhost:3000"],
@@ -47,40 +27,79 @@ apiServer.use(
     })
 );
 
-// Middleware for serving static files (e.g., file uploads)
-// apiServer.use("/uploads", express.static(path.join(__dirname, "uploads")));
+const post =[
+    {
+        username:'admin',
+        tilte:'post 1'
+    },
+    {
+        username:'admin2',
+        tilte:'post 2'
+    }
+]
 
-// Connect to the MongoDB database using the provided URI in the environment variables
+function generateAccessToken(user){
+    return jwt.sign(user,process.env.jwtSecrets,{expiresIn:'15s'})
+}
+
+function authenticateToken(req,res,next){
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    if(token==null) return res.sendStatus(401)
+
+    jwt.verify(token,process.env.jwtSecrets,(err,user)=>{
+        if(err) return res.sendStatus(403)
+        req.user = user
+        next()
+    })
+}
+let storerefreshToken = [];
 mongoose
     .connect(process.env.mongodbUri)
     .then(() => {
         apiServer.get('/', (req, res) => {
             res.send("Welcome 👋 to School ERP 👩‍🏫");
         });
-        // Use middlewares imported from the middlewares folder
 
-        // Middleware to use the student routes
         apiServer.use("/api/students", studentRoute);
-
-        // Middleware to use the fees routes
         apiServer.use("/api/fees", feesRoute);
-
-        // Middleware to use the school routes
         apiServer.use("/api/school", schoolRoute)
-
-        // Middleware to use emp routes
         apiServer.use("/api/emp", empRoute)
-
-        //Middleware to use attendance routes
         apiServer.use("/api/attendance", attendanceRoute)
-
-        // Middleware to use student fees routes
         apiServer.use("/api/studentfees", studentFeesRoute)
+        apiServer.get('/posts',authenticateToken,(req,res)=>{
+            console.log(req.user.name);
+            res.json(post.filter(post => post.username === req.user.name));
+        })
 
-        // Uncomment and add similar middleware for contactUsRoute if needed
-        // apiServer.use('/api/contactus/', contactUsRoute)
+        apiServer.post('/login',(req,res)=>{
+            const username = req.body.username;
+            console.log(username);
+            const user = {name:username}
 
-        // Start the Express server, listening on the specified port
+            const accessToken = generateAccessToken(user)
+            const refreshToken = jwt.sign(user,process.env.refreshTokenSecrets);
+            storerefreshToken.push(refreshToken);
+            res.json({accessToken:accessToken,refreshToken:refreshToken});
+        })
+
+        apiServer.post('/token',(req,res)=>{
+            const refreshToken = req.body.token;
+            if(refreshToken == null) return res.sendStatus(401)
+
+            if(!storerefreshToken.includes(refreshToken)) return res.sendStatus(403)
+            jwt.verify(refreshToken,process.env.refreshTokenSecrets,(err,user)=>{
+                if(err) return res.sendStatus(403)
+                const accessToken = generateAccessToken({name:user.name})
+                res.json({accessToken:accessToken})
+            })
+        });
+
+        apiServer.delete('/logout',(req,res)=>{
+            storerefreshToken = storerefreshToken.filter(token => token !== req.body.token)
+            res.sendStatus(204)
+        })
+
         apiServer.listen(serverPort, () => {
             console.log(`Server running on port: ${serverPort}`);
         });
