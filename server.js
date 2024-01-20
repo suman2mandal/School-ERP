@@ -1,5 +1,4 @@
 import dotenv from "dotenv";
-dotenv.config();
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
@@ -7,19 +6,20 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import studentRoute from "./routes/studentRoutes.js";
 import feesRoute from "./routes/feesRoutes.js";
-import schoolRoute from "./routes/schoolRoutes.js"
-import empRoute from "./routes/empRoutes.js"
-import attendanceRoute from "./routes/attendanceRoutes.js"
-import studentFeesRoute from "./routes/studentFeesRoutes.js"
+import schoolRoute from "./routes/schoolRoutes.js";
+import empRoute from "./routes/empRoutes.js";
+import attendanceRoute from "./routes/attendanceRoutes.js";
+import studentFeesRoute from "./routes/studentFeesRoutes.js";
 import jwt from "jsonwebtoken";
 
 const serverPort = process.env.PORT || 5000;
 const apiServer = express();
+
+dotenv.config();
 apiServer.use(express.json());
 apiServer.use(express.urlencoded({ extended: false }));
 apiServer.use(bodyParser.json());
 apiServer.use(cookieParser());
-
 apiServer.use(
     cors({
         origin: ["http://localhost:3000"],
@@ -39,18 +39,18 @@ const post =[
 ]
 
 function generateAccessToken(user){
-    return jwt.sign(user,process.env.jwtSecrets,{expiresIn:'15s'})
+    return jwt.sign(user,process.env.jwtSecrets,{expiresIn:'15s'});
 }
 
 function authenticateToken(req,res,next){
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
-    if(token==null) return res.sendStatus(401)
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if(token==null) return res.sendStatus(401);
 
     jwt.verify(token,process.env.jwtSecrets,(err,user)=>{
-        if(err) return res.sendStatus(403)
-        req.user = user
-        next()
+        if(err) return res.sendStatus(403);
+        req.user = user;
+        next();
     })
 }
 let storerefreshToken = [];
@@ -63,16 +63,16 @@ mongoose
 
         apiServer.use("/api/students", studentRoute);
         apiServer.use("/api/fees", feesRoute);
-        apiServer.use("/api/school", schoolRoute)
-        apiServer.use("/api/emp", empRoute)
-        apiServer.use("/api/attendance", attendanceRoute)
-        apiServer.use("/api/studentfees", studentFeesRoute)
+        apiServer.use("/api/school", schoolRoute);
+        apiServer.use("/api/emp", empRoute);
+        apiServer.use("/api/attendance", attendanceRoute);
+        apiServer.use("/api/studentfees", studentFeesRoute);
         apiServer.get('/posts',authenticateToken,(req,res)=>{
             console.log(req.user.name);
             res.json(post.filter(post => post.username === req.user.name));
         })
 
-        apiServer.post('/login',(req,res)=>{
+        apiServer.post('/login',(req,res)=> {
             const username = req.body.username;
             console.log(username);
             const user = {name:username}
@@ -83,7 +83,7 @@ mongoose
             res.json({accessToken:accessToken,refreshToken:refreshToken});
         })
 
-        apiServer.post('/token',(req,res)=>{
+        apiServer.post('/retoken',(req,res)=> {
             const refreshToken = req.body.token;
             if(refreshToken == null) return res.sendStatus(401)
 
@@ -95,7 +95,7 @@ mongoose
             })
         });
 
-        apiServer.delete('/logout',(req,res)=>{
+        apiServer.delete('/logout',(req,res)=> {
             storerefreshToken = storerefreshToken.filter(token => token !== req.body.token)
             res.sendStatus(204)
         })
