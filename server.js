@@ -60,13 +60,12 @@ mongoose
         apiServer.get('/', (req, res) => {
             res.send("Welcome 👋 to School ERP 👩‍🏫");
         });
-
-        apiServer.use("/api/students", studentRoute);
-        apiServer.use("/api/fees", feesRoute);
-        apiServer.use("/api/school", schoolRoute);
-        apiServer.use("/api/emp", empRoute);
-        apiServer.use("/api/attendance", attendanceRoute);
-        apiServer.use("/api/studentfees", studentFeesRoute);
+        apiServer.use("/api/v1/students", studentRoute);
+        apiServer.use("/api/v1/fees", feesRoute);
+        apiServer.use("/api/v1/school", schoolRoute);
+        apiServer.use("/api/v1/emp", empRoute);
+        apiServer.use("/api/v1/attendance", attendanceRoute);
+        apiServer.use("/api/v1/studentfees", studentFeesRoute);
         apiServer.get('/posts',authenticateToken,(req,res)=>{
             console.log(req.user.name);
             res.json(post.filter(post => post.username === req.user.name));

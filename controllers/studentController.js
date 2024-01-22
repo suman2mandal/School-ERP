@@ -7,13 +7,10 @@ const validateRequiredFields = (body, requiredFields) => {
 };
 
 const createStudent = asyncHandler(async (req, res) => {
-
     const today = new Date();
 
-
     const requiredFields = [
-        'school',
-        'registerationNumber', 'registerationDate', 'studentClass', 'phoneNumber',
+        'school', 'registerationNumber', 'registerationDate', 'studentClass', 'phoneNumber',
         'section', 'studentName', 'fatherName', 'motherName', 'gender',
         'alternatePhoneNumber', 'email', 'address', 'town',
         'district', 'state', 'pincode', 'landMark', 'rollNumber', 'aaadharNumber',
@@ -21,42 +18,38 @@ const createStudent = asyncHandler(async (req, res) => {
     ];
 
     if (!validateRequiredFields(req.body, requiredFields)) {
-        res.status(400).json({ error: 'Please fill all the required fields' });
-        return;
+        return res.status(400).json({ error: 'Please fill all the required fields' });
     }
 
     const gotDob = req.body['dob'];
 
     const { city, village } = req.body;
     if (!city || !village) {
-        res.status(400).json({ error: 'Please add city or village' });
-        return;
+        return res.status(400).json({ error: 'Please add city or village' });
     }
 
-    const { studentClass } = req.body;
-    const { school } = await req.body
+    const { studentClass, school } = req.body;
     const feesInfo = await Fees.findOne({ studentClass, school });
     const monthlyFees = feesInfo?.feesAmount || 0;
     const age = today.getFullYear() - new Date(gotDob).getFullYear();
-    const studentData = { ...req.body, monthlyFees, school, age };
+    const studentData = { ...req.body, monthlyFees, age, deleted: false }; // Set deleted to false
 
     try {
         const student = await Student.create(studentData);
         const responseData = mapStudentData(student);
-        res.status(201).json(responseData);
+        return res.status(201).json(responseData);
     } catch (error) {
         console.error('Error creating student:', error);
-        res.status(500).json({ error: 'Student creation failed' });
+        return res.status(500).json({ error: 'Student creation failed' });
     }
 });
 
 const updateStudent = asyncHandler(async (req, res) => {
-    const { registerationNumber } = req.params;
-    const student = await Student.findOne({ registerationNumber });
+    const { registerationNumber } = req.body;
+    const student = await Student.findOne({ registerationNumber, deleted: false });
 
     if (!student) {
-        res.status(404).json({ error: 'Student not found' });
-        return;
+        return res.status(404).json({ error: 'Student not found' });
     }
 
     const fieldsToUpdate = [
@@ -66,7 +59,6 @@ const updateStudent = asyncHandler(async (req, res) => {
         'pincode', 'village', 'landMark', 'lastSchoolName', 'lastClass', 'lastClassScore',
         'lastClassYear', 'lastClassTC', 'lastClassReason', 'lastClassBoard', 'lastClassMedium', 'lastClassCity',
     ];
-
 
     fieldsToUpdate.forEach(field => {
         student[field] = req.body[field] || student[field];
@@ -80,6 +72,7 @@ const updateStudent = asyncHandler(async (req, res) => {
     const responseData = mapStudentData(updatedStudent);
     res.status(200).json(responseData);
 });
+
 
 const mapStudentData = (student) => {
     const fieldsToInclude = [
@@ -95,30 +88,30 @@ const mapStudentData = (student) => {
     }, {});
 };
 
-const readStudents = asyncHandler(async (req, res) => {
-    const students = await Student.find()
-    console.log("hit");
-    if (students) {
-        res.status(200).json({ students })
-    }
-    else {
-        res.status(404).json({ error: "No students found" })
-    }
-})
+const readAllStudents = asyncHandler(async (req, res) => {
+    const students = await Student.find({ deleted: { $ne: true } });
 
-const readAllClassStudents = asyncHandler(async (req, res) => {
-    const students = await Student.find({ school: req.body.school, studentClass: req.body.studentClass })
-    if (students && students.length > 0) {
+    if (students.length > 0) {
         res.status(200).json({ students });
     } else {
         res.status(404).json({ error: "No students found" });
     }
 });
 
-const readAllStudents = asyncHandler(async (req, res) => {
+const readAllClassStudents = asyncHandler(async (req, res) => {
+    const { school, studentClass } = req.body;
+    const students = await Student.find({ school, studentClass, deleted: { $ne: true } });
+
+    if (students && students.length > 0) {
+        res.status(200).json({ students });
+    } else {
+        res.status(404).json({ error: "No students found" });
+    }
+});
+const readAllStudentsOfaSchool = asyncHandler(async (req, res) => {
     try {
-        const students = await Student.find({ school: req.body.school });
-        console.log(students)
+        const { school } = req.body;
+        const students = await Student.find({ school, deleted: { $ne: true } });
 
         if (students.length > 0) {
             res.status(200).json(students);
@@ -132,25 +125,42 @@ const readAllStudents = asyncHandler(async (req, res) => {
 });
 
 const readOneStudent = asyncHandler(async (req, res) => {
-    const student = await Student.find({ registerationNumber: req.body.registerationNumber })
+    const { registerationNumber } = req.body;
+    const student = await Student.findOne({ registerationNumber, deleted: { $ne: true } });
+
     if (student) {
-        res.status(200).json({ student })
+        res.status(200).json({ student });
+    } else {
+        res.status(404).json({ error: "No student found" });
     }
-    else {
-        res.status(404).json({ error: "No student found" })
-    }
-})
+});
 
 const deleteStudent = asyncHandler(async (req, res) => {
-    const studentToDelete = await Student.find({ registerationNumber: req.body.registerationNumber })
+    const { registerationNumber } = req.body;
+    const studentToDelete = await Student.findOne({ registerationNumber });
 
-    if (studentToDelete) {
-        await Student.deleteOne()
-        res.status(200).json({ studentToDelete })
+    if (!studentToDelete) {
+        return res.status(404).json({ error: "No student found" });
     }
-    else {
-        res.status(404).json({ error: "No student found" })
-    }
-})
 
-export { createStudent, updateStudent, readStudents, readOneStudent, deleteStudent, readAllStudents, readAllClassStudents };
+    // Instead of physically removing the document, mark it as deleted
+    studentToDelete.deleted = true;
+
+    try {
+        const updatedStudent = await studentToDelete.save();
+        res.status(200).json({ studentToDelete: updatedStudent });
+    } catch (error) {
+        console.error('Error marking student as deleted:', error);
+        res.status(500).json({ error: 'Failed to mark student as deleted' });
+    }
+});
+
+export {
+    createStudent,
+    updateStudent,
+    readAllStudentsOfaSchool,
+    readOneStudent,
+    deleteStudent,
+    readAllStudents,
+    readAllClassStudents
+};

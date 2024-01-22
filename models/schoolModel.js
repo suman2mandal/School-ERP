@@ -1,9 +1,17 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs"
 const schoolSchema = mongoose.Schema({
-    schoolId: {
+    schoolName: {
         type: String,
-        required: [true, "Please add school id"],
+        required: [true, "Please add school name"],
+    },
+    schoolLocation: {
+        type: String,
+        required: [true, "Please add school location"],
+    },
+    schoolEstablished: {
+        type: Date,
+        required: [true, "Please add school established date"],
     },
     schoolPassword: {
         type: String,

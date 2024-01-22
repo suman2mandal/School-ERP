@@ -7,12 +7,12 @@ const router = express.Router();
 router.post('/addfees', addFees);
 
 // Update fees
-router.post('/updatefees', updateFees);
+router.put('/updatefees', updateFees);
 
 // Read fees
-router.post('/readfees', readFees)
+router.get('/readfees', readFees)
 
 // Delete fees
-router.post('/deletefees', deleteFees)
+router.delete('/deletefees', deleteFees)
 
 export default router;

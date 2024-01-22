@@ -159,6 +159,10 @@ const studentSchema = mongoose.Schema({
         type: String,
         default: 'n/a'
     },
+    deleted: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const Student = mongoose.model("Student", studentSchema);

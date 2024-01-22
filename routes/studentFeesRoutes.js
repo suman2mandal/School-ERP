@@ -1,11 +1,24 @@
-import express from "express"
-import { getTotalBalance, readFees, receiveFees } from "../controllers/studentFeesController.js"
-const router = express.Router()
+import express from "express";
+import { receiveFees, readFees, getTotalBalance, updateFees, deleteFees, getAllStudentBalances } from "../controllers/studentFeesController.js";
 
-router.post('/receivefees', receiveFees)
+const router = express.Router();
 
-router.post('/readfees', readFees)
+// Create fees record
+router.post('/receivefees', receiveFees);
 
-router.post('/allbalance', getTotalBalance)
+// Read fees records
+router.post('/readfees', readFees);
 
-export default router
+// Get total balance for a student
+router.post('/totalbalance', getTotalBalance);
+
+// Update fees record
+router.put('/updatefees/:id', updateFees); // Assuming you pass fees record ID in the URL
+
+// Delete fees record
+router.delete('/deletefees/:id', deleteFees); // Assuming you pass fees record ID in the URL
+
+// Get all students with their current balances
+router.get('/allbalance', getAllStudentBalances);
+
+export default router;
